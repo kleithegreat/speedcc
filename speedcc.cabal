@@ -1,0 +1,31 @@
+cabal-version:   3.0
+name:            speedcc
+version:         0.1.0.0
+license:         BSD-3-Clause
+license-file:    LICENSE
+author:          kevin
+maintainer:      kevvinlei89@gmail.com
+build-type:      Simple
+extra-doc-files: CHANGELOG.md
+
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    exposed-modules:  Lexer, Parser, Codegen
+    build-depends:    base ^>=4.18.3.0
+                    , megaparsec >= 9.0
+                    , text
+                    , containers
+    hs-source-dirs:   src
+    default-language: GHC2021
+    default-extensions: OverloadedStrings
+
+executable speedcc
+    import:           warnings
+    main-is:          Main.hs
+    build-depends:    base ^>=4.18.3.0
+                    , speedcc
+    hs-source-dirs:   app
+    default-language: GHC2021
