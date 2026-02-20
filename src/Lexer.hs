@@ -6,7 +6,10 @@ data Token = OBrace | CBrace |
              Semicolon |
              IntKeyword | ReturnKeyword |
              Identifier String |
-             IntegerLiteral Integer
+             IntegerLiteral Integer |
+             Neg |
+             BitComp |
+             Not 
              deriving Show
 
 scan :: String -> [Token]
@@ -17,6 +20,9 @@ scan ('}':xs) = CBrace : scan xs
 scan ('(':xs) = OParen : scan xs
 scan (')':xs) = CParen : scan xs
 scan (';':xs) = Semicolon : scan xs
+scan ('-':xs) = Neg : scan xs
+scan ('~':xs) = BitComp : scan xs
+scan ('!':xs) = Not : scan xs
 scan xs | word == "" = error $ "Illegal Character: " ++ [head xs]
         | word == "int" = IntKeyword : scan rest
         | word == "return" = ReturnKeyword : scan rest
