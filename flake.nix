@@ -21,6 +21,7 @@
               hp.containers
             ]))
             hsPkgs.cabal-install
+            hsPkgs.haskell-language-server
           ];
         };
       }
