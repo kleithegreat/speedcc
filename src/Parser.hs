@@ -1,7 +1,8 @@
 module Parser where
 import Lexer ( Token(..) )
 
-data Exp = Const Integer deriving (Show, Eq)
+data Exp = UnOp UnaryOperator Exp | Const Integer deriving (Show, Eq)
+data UnaryOperator = Negate | Complement | LogicalNot deriving (Show, Eq)
 data Statement = Return Exp deriving (Show, Eq)
 data FuncDecl = Func String Statement deriving (Show, Eq)
 data Prog = Prog FuncDecl deriving (Show, Eq)
@@ -19,18 +20,22 @@ prettyStmt :: Int -> Statement -> String
 prettyStmt n (Return e) = indent n ++ "Return\n" ++ prettyExp (n + 1) e
 
 prettyExp :: Int -> Exp -> String
-prettyExp n (Const num) = indent n ++ "Const: " ++ show num
+prettyExp n (Const num) = indent n ++ "Const: " ++ show num -- todo
 
 newtype Parser a = P ([Token] -> Maybe (a, [Token]))
 
 parse :: Parser a -> [Token] -> Maybe (a, [Token])
 parse (P parser) = parser
 
--- instance Functor Parser where
---     fmap f pa = case (\input -> parse pa input) of
---         Nothing -> P Nothing
---         Just (a, rest) -> P (f a, rest)
+instance Functor Parser where
+    fmap :: (a -> b) -> Parser a -> Parser b
+    fmap f pa = P $ \input -> case (parse pa input) of
+        Just (a, rest) -> Just (f a, rest)
+        _ -> Nothing
 
+-- instance Applicative Parser where
+--     pure :: a -> Parser a
+--     pure a =
 
 parseExp :: [Token] -> Maybe (Exp, [Token])
 parseExp [] = Nothing
