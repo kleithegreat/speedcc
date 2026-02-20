@@ -6,6 +6,21 @@ data Statement = Return Exp deriving (Show, Eq)
 data FuncDecl = Func String Statement deriving (Show, Eq)
 data Prog = Prog FuncDecl deriving (Show, Eq)
 
+indent :: Int -> String
+indent n = replicate (n * 2) ' '
+
+pretty :: Int -> Prog -> String
+pretty n (Prog func) = indent n ++ "Program\n" ++ prettyFunc (n + 1) func
+
+prettyFunc :: Int -> FuncDecl -> String
+prettyFunc n (Func name stmt) = indent n ++ "Function: " ++ name ++ "\n" ++ prettyStmt (n + 1) stmt
+
+prettyStmt :: Int -> Statement -> String
+prettyStmt n (Return e) = indent n ++ "Return\n" ++ prettyExp (n + 1) e
+
+prettyExp :: Int -> Exp -> String
+prettyExp n (Const num) = indent n ++ "Const: " ++ show num
+
 newtype Parser a = P ([Token] -> Maybe (a, [Token]))
 
 parse :: Parser a -> [Token] -> Maybe (a, [Token])
