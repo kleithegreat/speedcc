@@ -1,5 +1,5 @@
 module Codegen where
-import Parser (Prog (..), FuncDecl (..), Statement (..), Exp (..))
+import AST (Prog (..), FuncDecl (..), Statement (..), Exp (..))
 
 emitExp :: Exp -> [String]
 emitExp (Const num) = ["movq $" ++ show num ++ ", %rax"]

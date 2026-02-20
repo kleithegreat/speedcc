@@ -1,6 +1,8 @@
 module Main where
+
+import AST ( pretty )
 import Lexer ( scan )
-import Parser ( parseProg, pretty )
+import Parser ( parseProg )
 import Codegen ( emit )
 import System.Environment ( getArgs )
 import System.FilePath ( dropExtension )
