@@ -23,6 +23,9 @@
             hsPkgs.cabal-install
             hsPkgs.haskell-language-server
           ];
+          shellHook = ''
+            alias build='cabal build && cp /home/kevin/repos/speedcc/dist-newstyle/build/x86_64-linux/ghc-9.10.3/speedcc-0.1.0.0/x/speedcc/build/speedcc/speedcc .'
+          '';
         };
       }
     );
