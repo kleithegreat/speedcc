@@ -40,6 +40,11 @@ orCombinator pa pb = P $ \toks -> case parse pa toks of
     Just (a, rest) -> Just (a, rest)
     Nothing -> parse pb toks
 
+eof :: Parser ()
+eof = P $ \toks -> case toks of
+    [] -> Just ((), [])
+    _  -> Nothing
+
 parseIntLiteral :: Parser Exp
 parseIntLiteral = check $ \tok -> case tok of
     IntegerLiteral num -> Just (Const num)
@@ -61,7 +66,7 @@ parseExp = parseUnaryOperator `orCombinator` parseIntLiteral
 parseStatement :: Parser Statement
 parseStatement = do
     _ <- check $ \tok -> case tok of
-        ReturnKeyword -> Just Return
+        ReturnKeyword -> Just ()
         _ -> Nothing
     val <- parseExp
     _ <- check $ \tok -> case tok of
@@ -69,31 +74,31 @@ parseStatement = do
         _ -> Nothing
     return $ Return val
 
--- parseStatement :: [Token] -> Maybe (Statement, [Token])
--- parseStatement [] = Nothing
--- parseStatement (x:xs) = case x of
---     ReturnKeyword -> let res = parseExp xs in case res of
---         Just (expr, rest) -> let end = head rest in case end of
---             Semicolon -> Just (Return expr, tail rest)
---             _ -> Nothing
---         _ -> Nothing
---     _ -> Nothing
--- 
--- parseFuncDecl :: [Token] -> Maybe (FuncDecl, [Token])
--- -- IntKeyword, Identifier, OParen, CParen, OBrace, PARSE_STATEMENT, CBrace
--- parseFuncDecl [] = Nothing
--- parseFuncDecl (ik:id:op:cp:ob:xs) = case (ik, id, op, cp, ob) of
---     (IntKeyword, Identifier name, OParen, CParen, OBrace) -> let res = parseStatement xs in case res of
---         Just (statement, rest) -> let end = head rest in case end of
---             CBrace -> Just (Func name statement, tail rest)
---             _ -> Nothing
---         _ -> Nothing
---     _ -> Nothing
--- parseFuncDecl _ = Nothing
--- 
--- parseProg :: [Token] -> Maybe (Prog, [Token])
--- parseProg [] = Nothing
--- parseProg xs = case parseFuncDecl xs of
---     Just (func, []) -> Just (Prog func, [])
---     Just (_, _) -> Nothing
---     _ -> Nothing
+parseFuncDecl :: Parser FuncDecl
+parseFuncDecl = do
+    _ <- check $ \tok -> case tok of
+        IntKeyword -> Just ()
+        _ -> Nothing
+    funcName <- check $ \tok -> case tok of
+        Identifier n -> Just n
+        _ -> Nothing
+    _ <- check $ \tok -> case tok of
+        OParen -> Just ()
+        _ -> Nothing
+    _ <- check $ \tok -> case tok of
+        CParen -> Just ()
+        _ -> Nothing
+    _ <- check $ \tok -> case tok of
+        OBrace -> Just ()
+        _ -> Nothing
+    statement <- parseStatement
+    _ <- check $ \tok -> case tok of
+        CBrace -> Just ()
+        _ -> Nothing
+    return $ Func funcName statement
+
+parseProg :: Parser Prog
+parseProg = do
+    func <- parseFuncDecl
+    eof
+    return $ Prog func

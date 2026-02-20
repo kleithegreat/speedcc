@@ -1,8 +1,8 @@
 module Main where
 
-import AST ( pretty )
+-- import AST ( pretty )
 import Lexer ( scan )
-import Parser ( parseProg )
+import Parser ( parse, parseProg )
 import Codegen ( emit )
 import System.Environment ( getArgs )
 import System.FilePath ( dropExtension )
@@ -16,8 +16,8 @@ main = do
     let baseName = dropExtension filename
     let asmFile = baseName ++ ".s"
 
-    case parseProg scanned of
-        Just (parsed, []) -> do
+    case parse parseProg scanned of
+        Just (parsed, _) -> do
             let asm = emit parsed
             writeFile asmFile $ unlines asm
             callProcess "gcc" [asmFile, "-o", baseName]

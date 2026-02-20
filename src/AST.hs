@@ -20,4 +20,5 @@ prettyStmt :: Int -> Statement -> String
 prettyStmt n (Return e) = indent n ++ "Return\n" ++ prettyExp (n + 1) e
 
 prettyExp :: Int -> Exp -> String
-prettyExp n (Const num) = indent n ++ "Const: " ++ show num -- todo
+prettyExp n (Const num) = indent n ++ "Const: " ++ show num
+prettyExp n (UnOp op e) = indent n ++ "UnaryOp: " ++ show op ++ "\n" ++ prettyExp (n + 1) e

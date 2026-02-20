@@ -10,11 +10,11 @@ data Token = OBrace | CBrace |
              Neg |
              BitComp |
              Not 
-             deriving Show
+             deriving (Show, Eq)
 
 scan :: String -> [Token]
 scan "" = []
-scan xs | isSpace $ head xs = scan $ tail xs
+scan (x:xs) | isSpace $ x = scan $ xs
 scan ('{':xs) = OBrace : scan xs
 scan ('}':xs) = CBrace : scan xs
 scan ('(':xs) = OParen : scan xs
