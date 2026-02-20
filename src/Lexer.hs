@@ -7,10 +7,15 @@ data Token = OBrace | CBrace |
              IntKeyword | ReturnKeyword |
              Identifier String |
              IntegerLiteral Integer |
-             Neg |
-             BitComp |
-             Not 
+             Plus | Minus | Asterisk | ForwardSlash |
+             Tilde |
+             Bang
              deriving (Show, Eq)
+
+keyword :: String -> Token
+keyword "int" = IntKeyword
+keyword "return" = ReturnKeyword
+keyword name = Identifier name
 
 scan :: String -> [Token]
 scan "" = []
@@ -20,15 +25,14 @@ scan ('}':xs) = CBrace : scan xs
 scan ('(':xs) = OParen : scan xs
 scan (')':xs) = CParen : scan xs
 scan (';':xs) = Semicolon : scan xs
-scan ('-':xs) = Neg : scan xs
-scan ('~':xs) = BitComp : scan xs
-scan ('!':xs) = Not : scan xs
-scan xs | word == "" = error $ "Illegal Character: " ++ [head xs]
-        | word == "int" = IntKeyword : scan rest
-        | word == "return" = ReturnKeyword : scan rest
-        | isAlpha $ head word = Identifier word : scan rest
-        | otherwise = let
-            (num, rrest) = span isDigit word
-            in IntegerLiteral (read num :: Integer) : scan (rrest ++ rest)
-    where
-        (word, rest) = span isAlphaNum xs
+scan ('-':xs) = Minus : scan xs
+scan ('~':xs) = Tilde : scan xs
+scan ('!':xs) = Bang : scan xs
+scan ('+':xs) = Plus : scan xs
+scan ('*':xs) = Asterisk: scan xs
+scan ('/':xs) = ForwardSlash: scan xs
+scan (x:xs) | isAlpha x = keyword word : scan rest where
+    (word, rest) = span isAlphaNum (x:xs)
+scan (x:xs) | isDigit x = IntegerLiteral (read num) : scan rest where
+    (num, rest) = span isDigit (x:xs)
+scan (x:_) = error $ "Illegal character: " ++ [x]

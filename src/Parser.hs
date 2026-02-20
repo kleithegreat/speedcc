@@ -53,9 +53,9 @@ parseIntLiteral = check $ \tok -> case tok of
 parseUnaryOperator :: Parser Exp
 parseUnaryOperator = do
     operator <- check $ \tok -> case tok of
-        Neg -> Just Negate
-        BitComp -> Just Complement
-        Not -> Just LogicalNot
+        Minus -> Just Negate
+        Tilde -> Just Complement
+        Bang -> Just LogicalNot
         _ -> Nothing
     next <- parseExp
     return $ UnOp operator next
