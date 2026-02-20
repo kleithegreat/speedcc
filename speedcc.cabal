@@ -27,5 +27,7 @@ executable speedcc
     main-is:          Main.hs
     build-depends:    base >=4.18
                     , speedcc
+                    , filepath
+                    , process
     hs-source-dirs:   app
     default-language: GHC2021

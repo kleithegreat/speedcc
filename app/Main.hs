@@ -3,17 +3,26 @@ import Lexer ( scan )
 import Parser ( parseProg, pretty )
 import Codegen ( emit )
 import System.Environment ( getArgs )
+import System.FilePath ( dropExtension )
+import System.Process ( callProcess )
 
 main :: IO ()
 main = do
     [filename] <- getArgs
     source <- readFile filename
     let scanned = scan source
-    let Just (parsed, _) = parseProg scanned
-    let asm = emit parsed
-    putStrLn $ "Scanned tokens: " ++ show scanned
-    putStrLn ""
-    -- putStrLn $ "AST: " ++ show parsed
-    putStrLn $ pretty 0 parsed
-    putStrLn ""
-    putStrLn $ unlines asm
+    let baseName = dropExtension filename
+    let asmFile = baseName ++ ".s"
+
+    case parseProg scanned of
+        Just (parsed, []) -> do
+            let asm = emit parsed
+            writeFile asmFile $ unlines asm
+            callProcess "gcc" [asmFile, "-o", baseName]
+            -- putStrLn $ "Scanned tokens: " ++ show scanned
+            -- putStrLn ""
+            -- putStrLn $ "AST: " ++ show parsed
+            -- putStrLn $ pretty 0 parsed
+            -- putStrLn ""
+            putStrLn $ unlines asm
+        _ -> error "Parse failed"
