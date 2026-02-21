@@ -1,6 +1,6 @@
 module Parser where
 import Lexer ( Token(..) )
-import AST (Prog (..), FuncDecl (..), Statement (..), Exp (..), UnaryOperator (..))
+import AST (Prog (..), FuncDecl (..), Statement (..), Exp (..), UnaryOperator (..), BinaryOperator (..))
 
 newtype Parser a = P ([Token] -> Maybe (a, [Token]))
 
@@ -45,6 +45,17 @@ eof = P $ \toks -> case toks of
     [] -> Just ((), [])
     _  -> Nothing
 
+parseFactor :: Parser Exp
+parseFactor = do
+    _ <- check $ \tok -> case tok of
+        OParen -> Just ()
+        _ -> Nothing
+    middle <- parseExp
+    _ <- check $ \tok -> case tok of
+        CParen -> Just ()
+        _ -> Nothing
+    return middle $ `orCombinator` parseUnaryOperator `orCombinator` parseIntLiteral
+
 parseIntLiteral :: Parser Exp
 parseIntLiteral = check $ \tok -> case tok of
     IntegerLiteral num -> Just (Const num)
@@ -57,7 +68,7 @@ parseUnaryOperator = do
         Tilde -> Just Complement
         Bang -> Just LogicalNot
         _ -> Nothing
-    next <- parseExp
+    next <- parseFactor
     return $ UnOp operator next
 
 parseExp :: Parser Exp
